@@ -1,0 +1,868 @@
+﻿using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.Text;
+using System.Windows.Forms;
+
+namespace SmartBuilder.Controls
+{
+    public partial class ctrlSpDefinitions : UserControl
+    {
+        Action<string> AddToFastNote;
+        string ConnectionString = string.Empty, databaseName = string.Empty;
+        string userName = string.Empty, modDescription = string.Empty;
+
+        public ctrlSpDefinitions(string connectionString, string databaseName, Action<string> addToFastNote)
+        {
+            InitializeComponent();
+            this.Dock = DockStyle.Fill;
+            this.databaseName = databaseName;
+            this.ConnectionString = connectionString;
+            this.AddToFastNote = addToFastNote;
+
+            BindTableNames();
+            cbxOutputType.SelectedIndex = 0;
+        }
+
+        private void BindTableNames()
+        {
+            txtTableName.AutoCompleteMode = AutoCompleteMode.Suggest;
+            txtTableName.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            AutoCompleteStringCollection namesCollection = new AutoCompleteStringCollection();
+
+            namesCollection = USUtil.GetTableList(databaseName, ConnectionString);
+            txtTableName.AutoCompleteCustomSource = namesCollection;
+        }
+
+        private void btnGenrate_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                this.Cursor = Cursors.WaitCursor;
+
+                if (txtUserName.Text.Trim() != string.Empty && txtReason.Text.Trim() != string.Empty)
+                {
+
+                    userName = txtUserName.Text.Trim();
+                    modDescription = txtReason.Text.Trim();
+                    string queryString = GetQueryCode();
+                    SqlConnection conn = new SqlConnection(ConnectionString);
+                    conn.InfoMessage += Conn_InfoMessage;
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand(queryString, conn);
+                    SqlDataAdapter da = new SqlDataAdapter();
+                    da.SelectCommand = cmd;
+                    DataSet ds = new DataSet();
+                    da.Fill(ds);
+
+
+                    AddToFastNote(universalExtract);
+
+                }
+                else
+                    USUtil.DisplayMessage("A Valid Developer Name and Description is required", "Error while processing", false);
+
+            }
+            catch (SqlException ex)
+            {
+                USUtil.DisplayMessage(ex.Message, "SqlException", false);
+            }
+
+            this.Cursor = Cursors.Arrow;
+        }
+
+        string universalExtract = "";
+        private void Conn_InfoMessage(object sender, SqlInfoMessageEventArgs e)
+        {
+            string message = e.Message;
+            var firstWord = message.Substring(0, message.IndexOf(" "));
+            if (firstWord.ToLower() != "create")
+            { universalExtract += message; }
+            else
+            {
+                string procedureName = (message.Split('\r'))[0].Replace("CREATE PROC [dbo].", "");
+
+                string date = DateTime.Now.ToShortDateString();
+                StringBuilder sb = new StringBuilder();
+                sb.Append(USUtil.R);
+                sb.Append("/*******************************************************************\n");
+                sb.Append("* PROCEDURE: ");
+                sb.Append(procedureName);
+                sb.Append(USUtil.R);
+                sb.Append("* PURPOSE: {brief procedure description}");
+                sb.Append(USUtil.R);
+                sb.Append("* NOTES: {special set up or requirements, etc.}");
+                sb.Append(USUtil.R);
+                sb.Append("* CREATED:  {");
+                sb.Append(userName);
+                sb.Append("} {");
+                sb.Append(date);
+                sb.Append("}");
+                sb.Append(USUtil.R);
+                sb.Append("* MODIFIED");
+                sb.Append(USUtil.R);
+                sb.Append("* DATE            AUTHOR                  DESCRIPTION\n*-------------------------------------------------------------------\n");
+                sb.Append("* {");
+                sb.Append(date);
+                sb.Append("}");
+                sb.Append("     ");
+                sb.Append("{");
+                sb.Append(userName);
+                sb.Append("}");
+                sb.Append("     ");
+                sb.Append("{");
+                sb.Append(modDescription);
+                sb.Append("} ");
+                sb.Append(USUtil.R);
+                sb.Append("*******************************************************************/");
+                sb.Append(USUtil.R);
+
+                sb.Append(message);
+
+                universalExtract += sb.ToString();
+
+            }
+        }
+
+        private void cbxOutputType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.Select();
+        }
+
+        private void groupBox1_MouseHover(object sender, EventArgs e)
+        { this.Focus(); }
+
+        private string GetQueryCode()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            //Declare Table Name
+            sb.Append("DECLARE @GenerateProcsFor varchar(100)");
+            sb.Append(USUtil.R);
+            sb.Append("SET @GenerateProcsFor = ");
+            sb.Append("'" + txtTableName.Text.Trim() + "'");
+            sb.Append(USUtil.R);
+            sb.Append(USUtil.R);
+
+            //Declare Database Name
+            sb.Append("USE [");
+            sb.Append(databaseName);
+            sb.Append("]");
+            sb.Append(USUtil.R);
+            sb.Append("DECLARE @DatabaseName varchar(100)");
+            sb.Append(USUtil.R);
+            sb.Append("SET @DatabaseName = ");
+            sb.Append("'" + databaseName + "'");
+            sb.Append(USUtil.R);
+            sb.Append(USUtil.R);
+
+            //Declare Execution Type [Print / Execute]
+            sb.Append("DECLARE @PrintOrExecute varchar(10)");
+            sb.Append(USUtil.R);
+            sb.Append("SET @PrintOrExecute = ");
+            string outputType = "Print";
+            if (cbxOutputType.SelectedIndex == 1)
+            { outputType = "Execute"; }
+            sb.Append("'" + outputType + "'");
+            sb.Append(USUtil.R);
+            sb.Append(USUtil.R);
+
+            //Declare Exclude Prefix
+            sb.Append("DECLARE @TablePrefix  varchar(10)");
+            sb.Append(USUtil.R);
+            sb.Append("SET @TablePrefix = ");
+            string defaultPrefix = "tbl_";
+            string userPrefix = tbxExcludePrefix.Text.Trim();
+            if (defaultPrefix != userPrefix)
+                defaultPrefix = userPrefix;
+            sb.Append("'" + defaultPrefix + "'");
+            sb.Append(USUtil.R);
+            sb.Append(USUtil.R);
+
+            sb.Append("DECLARE @UseSelectWildCard bit");
+            sb.Append(USUtil.R);
+            sb.Append("SET @UseSelectWildCard  = ");
+            int selectionType = 0;
+            if (rbtn1.Checked)
+            { selectionType = 1; }
+            sb.Append(selectionType);
+            sb.Append(USUtil.R);
+            sb.Append(USUtil.R);
+
+
+            sb.Append("DECLARE TableCol Cursor FOR");
+            sb.Append("\r");
+            sb.Append(" SELECT c.TABLE_SCHEMA, c.TABLE_NAME, c.COLUMN_NAME, c.DATA_TYPE, c.CHARACTER_MAXIMUM_LENGTH ");
+            sb.Append("\r");
+            sb.Append(" FROM INFORMATION_SCHEMA.Columns c INNER JOIN ");
+            sb.Append("\r");
+            sb.Append(" INFORMATION_SCHEMA.Tables t ON c.TABLE_NAME = t.TABLE_NAME ");
+            sb.Append("\r");
+            sb.Append("WHERE t.Table_Catalog = @DatabaseName ");
+            sb.Append("\r");
+            sb.Append(" AND t.TABLE_TYPE = 'BASE TABLE' ");
+            sb.Append("\r");
+            sb.Append("ORDER BY c.TABLE_NAME, c.ORDINAL_POSITION ");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("DECLARE @TableSchema varchar(100), @TableName varchar(100) ");
+            sb.Append("\r");
+            sb.Append("DECLARE @ColumnName varchar(100), @DataType varchar(30) ");
+            sb.Append("\r");
+            sb.Append("DECLARE @CharLength int ");
+            sb.Append("\r");
+            sb.Append("DECLARE @ColumnNameCleaned varchar(100) ");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("DECLARE @CurrentTable varchar(100) ");
+            sb.Append("\r");
+            sb.Append("DECLARE @FirstTable bit ");
+            sb.Append("\r");
+            sb.Append("DECLARE @FirstColumnName varchar(100) ");
+            sb.Append("\r");
+            sb.Append("DECLARE @FirstColumnDataType varchar(30) ");
+            sb.Append("\r");
+            sb.Append("DECLARE @ObjectName varchar(100)-- this is the tablename with the ");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("DECLARE @TablePrefixLength int ");
+            sb.Append("\r");
+
+            sb.Append("\r");
+            sb.Append("SET @CurrentTable = '' ");
+            sb.Append("\r");
+            sb.Append("SET @FirstTable = 1 ");
+            sb.Append("\r");
+            sb.Append("SET @TablePrefixLength = Len(@TablePrefix) ");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("DECLARE @LIST nvarchar(4000), @UPSERT nvarchar(4000) ");
+            sb.Append("\r");
+            sb.Append("DECLARE @SELECT nvarchar(4000), @INSERT nvarchar(4000), @INSERTVALUES varchar(4000) ");
+            sb.Append("\r");
+            sb.Append("DECLARE @UPDATE nvarchar(4000), @DELETE nvarchar(4000) ");
+            sb.Append("\r");
+
+            sb.Append("\r");
+            sb.Append("OPEN TableCol ");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("FETCH NEXT FROM TableCol INTO @TableSchema, @TableName, @ColumnName, @DataType, @CharLength ");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("WHILE @@FETCH_STATUS = 0 BEGIN ");
+            sb.Append("\r");
+            sb.Append("    SET @ColumnNameCleaned = Replace(@ColumnName, ' ', '') ");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("    IF @TableName <> @CurrentTable BEGIN");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("        IF @CurrentTable <> '' BEGIN");
+            sb.Append("\r");
+            sb.Append("            IF @GenerateProcsFor = '' OR @GenerateProcsFor = @CurrentTable BEGIN");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("                SET @LIST = @List + Char(13) + 'FROM ' + @CurrentTable + Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @LIST = @LIST + Char(13) + Char(13) + 'SET NOCOUNT OFF' + Char(13) +");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @LIST = @LIST + Char(13)");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("                -- _sel");
+            sb.Append("\r");
+            sb.Append("                SET @SELECT = @SELECT + Char(13) + 'FROM ' + @CurrentTable + Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @SELECT = @SELECT + 'WHERE [' + @FirstColumnName + '] = @' + Replace");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("(@FirstColumnName, ' ', '') + Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @SELECT = @SELECT + Char(13) + Char(13) + 'SET NOCOUNT OFF' + Char(13)");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("+ Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @SELECT = @SELECT + Char(13)");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("                -- UPDATE(remove trailing comma and append the WHERE clause)");
+            sb.Append("\r");
+            sb.Append("                SET @UPDATE = SUBSTRING(@UPDATE, 0, LEN(@UPDATE) - 1) + Char(13) + Char(9) +");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("'WHERE [' + @FirstColumnName + '] = @' + Replace(@FirstColumnName, ' ', '') + Char(13)");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("                -- INSERT");
+            sb.Append("\r");
+            sb.Append("                SET @INSERT = SUBSTRING(@INSERT, 0, LEN(@INSERT) - 1) + Char(13) + Char(9)");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("+ ')' + Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @INSERTVALUES = SUBSTRING(@INSERTVALUES, 0, LEN(@INSERTVALUES) - 1) +");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("Char(13) + Char(9) + ')'");
+            sb.Append("\r");
+            sb.Append("                SET @INSERT = @INSERT + @INSERTVALUES");
+            sb.Append("");
+            sb.Append("\r");
+
+            sb.Append("                -- _ups");
+            sb.Append("\r");
+            sb.Append("                SET @UPSERT = @UPSERT + Char(13) + 'AS' + Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @UPSERT = @UPSERT + 'SET NOCOUNT ON' + Char(13)");
+            sb.Append("\r");
+            sb.Append("                IF @FirstColumnDataType IN('int', 'bigint', 'smallint', 'tinyint',");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("'float', 'decimal')");
+            sb.Append("\r");
+            sb.Append("                BEGIN");
+            sb.Append("\r");
+            sb.Append("                    SET @UPSERT = @UPSERT + 'IF @' + Replace(@FirstColumnName, ' ', '') + ' ");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("= 0 BEGIN' + Char(13)");
+            sb.Append("\r");
+            sb.Append("                END ELSE BEGIN");
+            sb.Append("\r");
+            sb.Append("                    SET @UPSERT = @UPSERT + 'IF @' + Replace(@FirstColumnName, ' ', '') + ' ");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("= '''' BEGIN' + Char(13)   ");
+            sb.Append("\r");
+            sb.Append("                END");
+            sb.Append("\r");
+            sb.Append("                SET @UPSERT = @UPSERT + ISNULL(@INSERT, '') + Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @UPSERT = @UPSERT + Char(9) + 'SELECT SCOPE_IDENTITY() As InsertedID' +");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @UPSERT = @UPSERT + 'END' + Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @UPSERT = @UPSERT + 'ELSE BEGIN' + Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @UPSERT = @UPSERT + ISNULL(@UPDATE, '') + Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @UPSERT = @UPSERT + 'END' + Char(13) + Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @UPSERT = @UPSERT + 'SET NOCOUNT OFF' + Char(13) + Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @UPSERT = @UPSERT + Char(13)");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("                -- _del");
+            sb.Append("\r");
+            sb.Append("                -- delete proc completed already");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("                ----------------------------------------------------");
+            sb.Append("\r");
+            sb.Append("                --now either print the SP definitions or");
+            sb.Append("\r");
+            sb.Append("                --execute the statements to create the procs");
+            sb.Append("\r");
+            sb.Append("                ----------------------------------------------------");
+            sb.Append("\r");
+            sb.Append("                IF @PrintOrExecute <> 'Execute' BEGIN");
+            sb.Append("\r");
+            sb.Append("                    PRINT @LIST");
+            sb.Append("\r");
+            sb.Append("                    PRINT @SELECT");
+            sb.Append("\r");
+            sb.Append("                    PRINT @UPSERT");
+            sb.Append("\r");
+            sb.Append("                    PRINT @DELETE");
+            sb.Append("\r");
+            sb.Append("                END ELSE BEGIN");
+            sb.Append("\r");
+            sb.Append("                    EXEC sp_Executesql @LIST");
+            sb.Append("\r");
+            sb.Append("                    EXEC sp_Executesql @SELECT");
+            sb.Append("\r");
+            sb.Append("                    EXEC sp_Executesql @UPSERT");
+            sb.Append("\r");
+            sb.Append("                    EXEC sp_Executesql @DELETE");
+            sb.Append("\r");
+            sb.Append("                END");
+            sb.Append("\r");
+            sb.Append("            END --end @GenerateProcsFor = '' OR @GenerateProcsFor = @CurrentTable");
+            sb.Append("\r");
+            sb.Append("        END");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("        -- update the value held in @CurrentTable");
+            sb.Append("\r");
+            sb.Append("        SET @CurrentTable = @TableName");
+            sb.Append("\r");
+            sb.Append("        SET @FirstColumnName = @ColumnName");
+            sb.Append("\r");
+            sb.Append("        SET @FirstColumnDataType = @DataType");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("        IF @TablePrefixLength > 0 BEGIN");
+            sb.Append("\r");
+            sb.Append("            IF SUBSTRING(@CurrentTable, 1, @TablePrefixLength) = @TablePrefix BEGIN");
+            sb.Append("\r");
+            sb.Append("                --PRINT Char(13) + 'DEBUG: OBJ NAME: ' + RIGHT(@CurrentTable, LEN(@CurrentTable) - @TablePrefixLength)");
+            sb.Append("\r");
+            sb.Append("                SET @ObjectName = RIGHT(@CurrentTable, LEN(@CurrentTable) -");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("@TablePrefixLength)");
+            sb.Append("\r");
+            sb.Append("            END ELSE BEGIN");
+            sb.Append("\r");
+            sb.Append("                SET @ObjectName = @CurrentTable");
+            sb.Append("\r");
+            sb.Append("            END");
+            sb.Append("\r");
+            sb.Append("        END ELSE BEGIN");
+            sb.Append("\r");
+            sb.Append("            SET @ObjectName = @CurrentTable");
+            sb.Append("\r");
+            sb.Append("        END");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("        IF @GenerateProcsFor = '' OR @GenerateProcsFor = @CurrentTable BEGIN");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("            ------------------------------------------------------");
+            sb.Append("\r");
+            sb.Append("            -- now start building the procedures for the next table");
+            sb.Append("\r");
+            sb.Append("            ------------------------------------------------------");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("            -- _lst");
+            sb.Append("\r");
+            sb.Append("            SET @LIST = 'CREATE PROC [dbo].[usp_' + @ObjectName + '_listAll]' + Char(13)");
+            sb.Append("\r");
+            sb.Append("            SET @LIST = @LIST + 'AS' + Char(13)");
+            sb.Append("\r");
+            sb.Append("            SET @LIST = @LIST + 'SET NOCOUNT ON' + Char(13)");
+            sb.Append("\r");
+            sb.Append("            IF @UseSelectWildcard = 1 BEGIN");
+            sb.Append("\r");
+            sb.Append("                SET @LIST = @LIST + Char(13) + 'SELECT * '");
+            sb.Append("\r");
+            sb.Append("            END");
+            sb.Append("\r");
+            sb.Append("            ELSE BEGIN");
+            sb.Append("\r");
+            sb.Append("                SET @LIST = @LIST + Char(13) + 'SELECT [' + @ColumnName + ']'");
+            sb.Append("\r");
+            sb.Append("            END");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("            -- _sel");
+            sb.Append("\r");
+            sb.Append("            SET @SELECT = 'CREATE PROC [dbo].[usp_' + @ObjectName + '_select]' + Char(13)");
+            sb.Append("\r");
+            sb.Append("            SET @SELECT = @SELECT + Char(9) + '@' + @ColumnNameCleaned + ' ' + @DataType");
+            sb.Append("\r");
+            sb.Append("            IF @DataType IN('varchar', 'nvarchar', 'char', 'nchar') BEGIN");
+            sb.Append("                SET @SELECT = @SELECT + '(' + CAST(@CharLength As varchar(10)) + ')'");
+            sb.Append("\r");
+            sb.Append("            END");
+            sb.Append("\r");
+            sb.Append("            SET @SELECT = @SELECT + Char(13) + 'AS' + Char(13)");
+            sb.Append("\r");
+            sb.Append("            SET @SELECT = @SELECT + 'SET NOCOUNT ON' + Char(13)");
+            sb.Append("\r");
+            sb.Append("            IF @UseSelectWildcard = 1 BEGIN");
+            sb.Append("\r");
+            sb.Append("                SET @SELECT = @SELECT + Char(13) + 'SELECT * '");
+            sb.Append("            END");
+            sb.Append("\r");
+            sb.Append("            ELSE BEGIN");
+            sb.Append("\r");
+            sb.Append("                SET @SELECT = @SELECT + Char(13) + 'SELECT [' + @ColumnName + ']'");
+            sb.Append("\r");
+            sb.Append("            END");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("            -- _ups");
+            sb.Append("\r");
+            sb.Append("            SET @UPSERT = 'CREATE PROC [dbo].[usp_' + @ObjectName + '_update]' + Char(13)");
+            sb.Append("\r");
+            sb.Append("                    SET @UPSERT = @UPSERT + Char(13) + Char(9) + '@' + @ColumnNameCleaned +");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("' ' + @DataType");
+            sb.Append("\r");
+            sb.Append("            IF @DataType IN('varchar', 'nvarchar', 'char', 'nchar') BEGIN");
+            sb.Append("\r");
+            sb.Append("                SET @UPSERT = @UPSERT + '(' + CAST(@CharLength As Varchar(10)) + ')'");
+            sb.Append("\r");
+            sb.Append("            END");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("            -- UPDATE");
+            sb.Append("\r");
+            sb.Append("            SET @UPDATE = Char(9) + 'UPDATE ' + @TableName + ' SET ' + Char(13)");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("            -- INSERT-- don't add first column to insert if it is an");
+            sb.Append("\r");
+            sb.Append("            --         integer(assume autonumber)");
+            sb.Append("\r");
+            sb.Append("            SET @INSERT = Char(9) + 'INSERT INTO ' + @TableName + ' (' + Char(13)");
+            sb.Append("\r");
+            sb.Append("            SET @INSERTVALUES = Char(9) + 'VALUES (' + Char(13)");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("            IF @FirstColumnDataType NOT IN('int', 'bigint', 'smallint', 'tinyint')");
+            sb.Append("\r");
+            sb.Append("            BEGIN");
+            sb.Append("\r");
+            sb.Append("                SET @INSERT = @INSERT + Char(9) + Char(9) + '[' + @ColumnName + '],' +");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("Char(13)");
+            sb.Append("\r");
+            sb.Append("                SET @INSERTVALUES = @INSERTVALUES + Char(9) + Char(9) + '@' +");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("@ColumnNameCleaned + ',' + Char(13)");
+            sb.Append("\r");
+            sb.Append("            END");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("            -- _del");
+            sb.Append("\r");
+            sb.Append("            SET @DELETE = 'CREATE PROC [dbo].[usp_' + @ObjectName + '_delete]' + Char(13)");
+            sb.Append("\r");
+            sb.Append("            SET @DELETE = @DELETE + Char(9) + '@' + @ColumnNameCleaned + ' ' + @DataType");
+            sb.Append("\r");
+            sb.Append("            IF @DataType IN('varchar', 'nvarchar', 'char', 'nchar') BEGIN");
+            sb.Append("\r");
+            sb.Append("                SET @DELETE = @DELETE + '(' + CAST(@CharLength As Varchar(10)) + ')'");
+            sb.Append("\r");
+            sb.Append("            END");
+            sb.Append("\r");
+            sb.Append("            SET @DELETE = @DELETE + Char(13) + 'AS' + Char(13)");
+            sb.Append("\r");
+            sb.Append("            SET @DELETE = @DELETE + 'SET NOCOUNT ON' + Char(13) + Char(13)");
+            sb.Append("\r");
+            sb.Append("            SET @DELETE = @DELETE + 'DELETE FROM ' + @TableName + Char(13)");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("            SET @DELETE = @DELETE + 'WHERE [' + @ColumnName + '] = @' + @ColumnNameCleaned");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("+ Char(13)");
+            sb.Append("\r");
+            sb.Append("            SET @DELETE = @DELETE + Char(13) + 'SET NOCOUNT OFF' + Char(13)");
+            sb.Append("\r");
+            sb.Append("            SET @DELETE = @DELETE + Char(13)");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("        END-- end @GenerateProcsFor = '' OR @GenerateProcsFor = @CurrentTable");
+            sb.Append("\r");
+            sb.Append("    END");
+            sb.Append("\r");
+            sb.Append("    ELSE BEGIN");
+            sb.Append("\r");
+            sb.Append("        IF @GenerateProcsFor = '' OR @GenerateProcsFor = @CurrentTable BEGIN");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("            -- is the same table as the last row of the cursor");
+            sb.Append("\r");
+            sb.Append("            -- just append the column");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("            -- _lst");
+            sb.Append("\r");
+            sb.Append("            IF @UseSelectWildCard = 0 BEGIN");
+            sb.Append("\r");
+            sb.Append("                SET @LIST = @LIST + ', ' + Char(13) + Char(9) + '[' + @ColumnName + ']'");
+            sb.Append("\r");
+            sb.Append("            END");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("            -- _sel");
+            sb.Append("\r");
+            sb.Append("            IF @UseSelectWildCard = 0 BEGIN");
+            sb.Append("\r");
+            sb.Append("                SET @SELECT = @SELECT + ', ' + Char(13) + Char(9) + '[' + @ColumnName + ']'");
+            sb.Append("\r");
+            sb.Append("            END");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("            -- _ups");
+            sb.Append("\r");
+            sb.Append("            SET @UPSERT = @UPSERT + ',' + Char(13) + Char(9) + '@' + @ColumnNameCleaned + ' ");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("' + @DataType");
+            sb.Append("\r");
+            sb.Append("            IF @DataType IN('varchar', 'nvarchar', 'char', 'nchar') BEGIN");
+            sb.Append("\r");
+            sb.Append("                SET @UPSERT = @UPSERT + '(' + CAST(@CharLength As varchar(10)) + ')'");
+            sb.Append("\r");
+            sb.Append("            END");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("            -- UPDATE");
+            sb.Append("\r");
+            sb.Append("            SET @UPDATE = @UPDATE + Char(9) + Char(9) + '[' + @ColumnName + '] = @' +");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("@ColumnNameCleaned + ',' + Char(13)");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("            -- INSERT");
+            sb.Append("\r");
+            sb.Append("            SET @INSERT = @INSERT + Char(9) + Char(9) + '[' + @ColumnName + '],' + Char(13)");
+            sb.Append("\r");
+            sb.Append("            SET @INSERTVALUES = @INSERTVALUES + Char(9) + Char(9) + '@' +");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("@ColumnNameCleaned + ',' + Char(13)");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("            -- _del");
+            sb.Append("\r");
+            sb.Append("            -- delete proc completed already");
+            sb.Append("\r");
+            sb.Append("        END-- end @GenerateProcsFor = '' OR @GenerateProcsFor = @CurrentTable'");
+            sb.Append("\r");
+            sb.Append("    END");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("    -- fetch next row of cursor into variables");
+            sb.Append("\r");
+            sb.Append("    FETCH NEXT FROM TableCol INTO @TableSchema, @TableName, @ColumnName, @DataType,");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("@CharLength");
+            sb.Append("\r");
+            sb.Append("END");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("------------------");
+            sb.Append("\r");
+            sb.Append("-- clean up cursor");
+            sb.Append("\r");
+            sb.Append("------------------");
+            sb.Append("\r");
+            sb.Append("CLOSE TableCol");
+            sb.Append("\r");
+            sb.Append("DEALLOCATE TableCol");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("--------------------------------------------------");
+            sb.Append("\r");
+            sb.Append("-- repeat the block of code from within the cursor");
+            sb.Append("\r");
+            sb.Append("-- So that the last table has its procs completed");
+            sb.Append("\r");
+            sb.Append("-- and printed / executed");
+            sb.Append("\r");
+            sb.Append("--------------------------------------------------");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("-- if is the end of the last table");
+            sb.Append("\r");
+            sb.Append("IF @CurrentTable <> '' BEGIN");
+            sb.Append("\r");
+            sb.Append("    IF @GenerateProcsFor = '' OR @GenerateProcsFor = @CurrentTable BEGIN");
+            sb.Append("\r");
+            sb.Append(""); sb.Append("\r");
+            sb.Append("        -- first add any syntax to end the statement");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("        --_lst");
+            sb.Append("\r");
+            sb.Append("        SET @LIST = @List + Char(13) + 'FROM ' + @CurrentTable + Char(13)");
+            sb.Append("\r");
+            sb.Append("        SET @LIST = @LIST + Char(13) + Char(13) + 'SET NOCOUNT OFF' + Char(13)");
+            sb.Append("\r");
+            sb.Append("        SET @LIST = @LIST + Char(13)");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("        -- _sel");
+            sb.Append("\r");
+            sb.Append("        SET @SELECT = @SELECT + Char(13) + 'FROM ' + @CurrentTable + Char(13)");
+            sb.Append("\r");
+            sb.Append("        SET @SELECT = @SELECT + 'WHERE [' + @FirstColumnName + '] = @' + Replace");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("(@FirstColumnName, ' ', '') + Char(13)");
+            sb.Append("\r");
+            sb.Append("        SET @SELECT = @SELECT + Char(13) + Char(13) + 'SET NOCOUNT OFF' + Char(13)");
+            sb.Append("\r");
+            sb.Append("        SET @SELECT = @SELECT + Char(13)");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("");
+            sb.Append("        -- UPDATE(remove trailing comma and append the WHERE clause)");
+            sb.Append("\r");
+            sb.Append("        SET @UPDATE = SUBSTRING(@UPDATE, 0, LEN(@UPDATE) - 1) + Char(13) + Char(9) + 'WHERE ");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("[' + @FirstColumnName + '] = @' + Replace(@FirstColumnName, ' ', '') + Char(13)");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("        -- INSERT");
+            sb.Append("\r");
+            sb.Append("        SET @INSERT = SUBSTRING(@INSERT, 0, LEN(@INSERT) - 1) + Char(13) + Char(9) + ')' +");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("Char(13)");
+            sb.Append("\r");
+            sb.Append("        SET @INSERTVALUES = SUBSTRING(@INSERTVALUES, 0, LEN(@INSERTVALUES) - 1) + Char(13) +");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("Char(9) + ')'");
+            sb.Append("\r");
+            sb.Append("        SET @INSERT = @INSERT + @INSERTVALUES");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("        -- _ups");
+            sb.Append("\r");
+            sb.Append("        SET @UPSERT = @UPSERT + Char(13) + 'AS' + Char(13)");
+            sb.Append("\r");
+            sb.Append("        SET @UPSERT = @UPSERT + 'SET NOCOUNT ON' + Char(13)");
+            sb.Append("\r");
+            sb.Append("        IF @FirstColumnDataType IN('int', 'bigint', 'smallint', 'tinyint', 'float',");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("'decimal')");
+            sb.Append("\r");
+            sb.Append("        BEGIN");
+            sb.Append("\r");
+            sb.Append("            SET @UPSERT = @UPSERT + 'IF @' + Replace(@FirstColumnName, ' ', '') + ' = 0 ");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("BEGIN' + Char(13)");
+            sb.Append("\r");
+            sb.Append("        END ELSE BEGIN");
+            sb.Append("\r");
+            sb.Append("            SET @UPSERT = @UPSERT + 'IF @' + Replace(@FirstColumnName, ' ', '') + ' = '''' ");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("BEGIN' + Char(13)   ");
+            sb.Append("\r");
+            sb.Append("        END");
+            sb.Append("\r");
+            sb.Append("        SET @UPSERT = @UPSERT + ISNULL(@INSERT, '') + Char(13)");
+            sb.Append("\r");
+            sb.Append("        SET @UPSERT = @UPSERT + Char(9) + 'SELECT SCOPE_IDENTITY() As InsertedID' + Char");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("(13)");
+            sb.Append("\r");
+            sb.Append("\r");
+            sb.Append("        SET @UPSERT = @UPSERT + 'END' + Char(13)");
+            sb.Append("\r");
+            sb.Append("        SET @UPSERT = @UPSERT + 'ELSE BEGIN' + Char(13)");
+            sb.Append("\r");
+            sb.Append("        SET @UPSERT = @UPSERT + ISNULL(@UPDATE, '') + Char(13)");
+            sb.Append("\r");
+            sb.Append("        SET @UPSERT = @UPSERT + 'END' + Char(13) + Char(13)");
+            sb.Append("\r");
+            sb.Append("        SET @UPSERT = @UPSERT + 'SET NOCOUNT OFF' + Char(13)");
+            sb.Append("\r");
+            sb.Append("        SET @UPSERT = @UPSERT + Char(13)");
+
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("        -- _del");
+            sb.Append("\r");
+            sb.Append("        -- delete proc completed already");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            sb.Append("        ----------------------------------------------------");
+            sb.Append("\r");
+            sb.Append("        --now either print the SP definitions or");
+            sb.Append("\r");
+            sb.Append("        --execute the statements to create the procs");
+            sb.Append("\r");
+            sb.Append("        ----------------------------------------------------");
+            sb.Append("\r");
+            sb.Append("        IF @PrintOrExecute <> 'Execute' BEGIN");
+            sb.Append("\r");
+            sb.Append("            PRINT @LIST");
+            sb.Append("\r");
+            sb.Append("            PRINT @SELECT");
+            sb.Append("\r");
+            sb.Append("            PRINT @UPSERT");
+            sb.Append("\r");
+            sb.Append("            PRINT @DELETE");
+            sb.Append("\r");
+            sb.Append("        END ELSE BEGIN");
+            sb.Append("            EXEC sp_Executesql @LIST");
+            sb.Append("\r");
+            sb.Append("            EXEC sp_Executesql @SELECT");
+            sb.Append("\r");
+            sb.Append("            EXEC sp_Executesql @UPSERT");
+            sb.Append("\r");
+            sb.Append("            EXEC sp_Executesql @DELETE");
+            sb.Append("\r");
+            sb.Append("        END");
+            sb.Append("\r");
+            sb.Append("    END --end @GenerateProcsFor = '' OR @GenerateProcsFor = @CurrentTable");
+            sb.Append("\r");
+            sb.Append("END");
+            sb.Append("\r");
+            sb.Append("");
+            sb.Append("\r");
+            return sb.ToString();
+        }
+
+
+    }
+}
