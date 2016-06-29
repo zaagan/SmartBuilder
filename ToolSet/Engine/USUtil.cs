@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SmartBuilder.ToolSet.Utilities;
+using System;
 using System.Data;
 using System.IO;
 using System.Text;
@@ -71,9 +72,9 @@ namespace SmartBuilder
         /// <param name="databaseName">The name of the database to query</param>
         /// <param name="connectionString">Connection parameters</param>
         /// <returns></returns>
-        public static AutoCompleteStringCollection GetTableList(string databaseName, string connectionString)
+        public static AutoCompleteStringCollection GetTablesFromDatabase(string databaseName, string connectionString)
         {
-            string strSelctTableQuery = SQLSelectQueryBuilder.BuildSelectQueryForTableBuilder(databaseName);
+            string strSelctTableQuery = SmartBuilder.Repository.MsSQL.QueryCollaborator.GenerateQuery_GetListOfTableNamesByDatabaseName(databaseName);
             AppUtilityDataProvider CtlUtility = new AppUtilityDataProvider();
             DataTable dt = CtlUtility.GetTableListofDataBase(strSelctTableQuery, connectionString);
             AutoCompleteStringCollection namesCollection = new AutoCompleteStringCollection();
@@ -91,7 +92,7 @@ namespace SmartBuilder
         /// <returns></returns>
         public static AutoCompleteStringCollection GetStoredProcedureList(string databaseName, string connectionString)
         {
-            string strSelctTableQuery = SQLSelectQueryBuilder.BuildSelectQueryForStoredProcedureBuilder(databaseName);
+            string strSelctTableQuery = SmartBuilder.Repository.MsSQL.QueryCollaborator.GenerateQuery_GetListOfStoredProceduresByDatabaseName(databaseName);
             AppUtilityDataProvider CtlUtility = new AppUtilityDataProvider();
             DataTable dt = CtlUtility.GetTableListofDataBase(strSelctTableQuery, connectionString);
             AutoCompleteStringCollection namesCollection = new AutoCompleteStringCollection();

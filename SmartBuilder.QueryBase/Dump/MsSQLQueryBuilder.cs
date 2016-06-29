@@ -1,31 +1,9 @@
 ﻿using System.Text;
 
-namespace SmartBuilder
+namespace SmartBuilder.QueryBase.Dump
 {
-    public class SQLSelectQueryBuilder
+    public class MsSQLQueryBuilder
     {
-        public static string BuildSelectQueryForTableBuilder(string databaseName)
-        {
-            StringBuilder strBuilder = new StringBuilder();
-
-            strBuilder.Append("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_CATALOG='");
-            strBuilder.Append(databaseName);
-            strBuilder.Append("'");
-
-            return strBuilder.ToString();
-        }
-
-        public static string BuildSelectQueryForStoredProcedureBuilder(string databaseName)
-        {
-            StringBuilder strBuilder = new StringBuilder();
-
-            strBuilder.Append("SELECT ROUTINE_NAME  from ");
-            strBuilder.Append(databaseName);
-            strBuilder.Append(".information_schema.routines where routine_type = 'PROCEDURE'");
-
-            return strBuilder.ToString();
-        }
-
         public static string SelectQueryBuilderForTable(string TableName)
         {
             StringBuilder strbQueryBuilder = new StringBuilder();
@@ -56,7 +34,7 @@ namespace SmartBuilder
             strbQueryBuilder.Append(" WHEN 'smallint' THEN 'short'");
             strbQueryBuilder.Append(" WHEN 'smallmoney' THEN 'decimal'");
             strbQueryBuilder.Append(" WHEN 'text' THEN 'string'");
-            strbQueryBuilder.Append( "WHEN 'time' THEN 'TimeSpan'");
+            strbQueryBuilder.Append("WHEN 'time' THEN 'TimeSpan'");
             strbQueryBuilder.Append(" WHEN 'timestamp' THEN 'DateTime'");
             strbQueryBuilder.Append(" WHEN 'tinyint' THEN 'byte'");
             strbQueryBuilder.Append(" WHEN 'uniqueidentifier' THEN 'Guid'");
@@ -79,6 +57,6 @@ namespace SmartBuilder
 
             return strbQueryBuilder.ToString();
         }
-   
+
     }
 }

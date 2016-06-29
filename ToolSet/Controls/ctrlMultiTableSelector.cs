@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Collections;
+using SmartBuilder.ToolSet.Utilities;
 
 namespace SmartBuilder.Controls
 {
@@ -23,7 +24,7 @@ namespace SmartBuilder.Controls
         private void BindCheckBoxList()
         {
             AutoCompleteStringCollection namesCollection = new AutoCompleteStringCollection();
-            namesCollection = USUtil.GetTableList(databaseName, ConnectionString);
+            namesCollection = USUtil.GetTablesFromDatabase(databaseName, ConnectionString);
             List<RandomClass> lst = new List<RandomClass>();
 
             for (int i = 0; i < namesCollection.Count; i++)
@@ -71,7 +72,7 @@ namespace SmartBuilder.Controls
 
             if (arrColl.Count > 0)
             {
-                AdonaiBuildStrucutreInfo buildInfo = new AdonaiBuildStrucutreInfo();
+                AdonaiBuildStructureInfo buildInfo = new AdonaiBuildStructureInfo();
                 buildInfo.IsSerializable = chklsSerializable.Checked;
                 buildInfo.IsControllerRequired = chkIsController.Checked;
                 buildInfo.IsProviderRequired = chkIsProviderRequred.Checked;

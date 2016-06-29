@@ -1,6 +1,6 @@
 ﻿namespace SmartBuilder
 {
-    public class AdonaiBuildStrucutreInfo
+    public class AdonaiBuildStructureInfo
     {
         public string ConnectionString { get; set; }
         public bool IsNullableRequired { get; set; }

@@ -510,6 +510,7 @@
             this.ftpTextBox.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.ftpTextBox.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.ftpTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ftpTextBox.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.ftpTextBox.IsReplaceMode = false;
             this.ftpTextBox.Language = FastColoredTextBoxNS.Language.CSharp;
             this.ftpTextBox.LeftBracket = '(';

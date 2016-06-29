@@ -69,6 +69,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\LanguageType.cs" />
+    <Compile Include="Enums\SourceType.cs" />
+    <Compile Include="RepositoryFactory.cs" />
     <Compile Include="ToolSet\Controls\AdonaiFastNote.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -108,15 +111,12 @@
     <Compile Include="ToolSet\Dumpyard\Dump.Designer.cs">
       <DependentUpon>Dump.cs</DependentUpon>
     </Compile>
-    <Compile Include="ToolSet\Engine\FileManager.cs" />
+    <Compile Include="ToolSet\Utilities\FileManager.cs" />
     <Compile Include="ToolSet\Engine\BELLBuilderControllers\BELLBuilderController.cs" />
     <Compile Include="ToolSet\Engine\ClassGenerator.cs" />
-    <Compile Include="ToolSet\Engine\DataProcessor\TableInfoGenerator.cs" />
-    <Compile Include="ToolSet\Engine\DataProcessor\SQLSelectQueryBuilder.cs" />
-    <Compile Include="ToolSet\Engine\GraphicsManager.cs" />
+    <Compile Include="ToolSet\ThemeManager\GraphicsManager.cs" />
     <Compile Include="ToolSet\Engine\SQLDataProvider\AppUtilityDataProvider.cs" />
     <Compile Include="ToolSet\Engine\USUtil.cs" />
-    <Compile Include="ToolSet\Info\AdonaiBuildStrucutreInfo.cs" />
     <Compile Include="ToolSet\ThemeManager\AdonaiStyle.cs" />
     <Compile Include="ToolSet\ThemeManager\AdonaiThemeColor.cs" />
     <Compile Include="ToolSet\ThemeManager\AdonaiThemeDefault.cs" />
@@ -131,6 +131,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ToolSet\Utilities\SystemSettings.cs" />
     <EmbeddedResource Include="ToolSet\Controls\AdonaiFastNote.resx">
       <DependentUpon>AdonaiFastNote.cs</DependentUpon>
     </EmbeddedResource>
@@ -181,6 +182,20 @@
     <Content Include="ToolSet\dlls\FastColoredTextBox.dll" />
     <Content Include="ToolSet\dlls\Microsoft.WindowsAPICodePack.dll" />
     <Content Include="ToolSet\dlls\Microsoft.WindowsAPICodePack.Shell.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="SmartBuilder.Interface\SmartBuilder.Interface.csproj">
+      <Project>{f0b4bb88-bcb7-4f9c-a2c7-097a71ea15f5}</Project>
+      <Name>SmartBuilder.Interface</Name>
+    </ProjectReference>
+    <ProjectReference Include="SmartBuilder.Repository.MsSQL\SmartBuilder.Repository.MsSQL.csproj">
+      <Project>{a9dad6ba-b205-4411-8d51-0e111e8e26fc}</Project>
+      <Name>SmartBuilder.Repository.MsSQL</Name>
+    </ProjectReference>
+    <ProjectReference Include="SmartBuilder.Utilities\SmartBuilder.Utilities.csproj">
+      <Project>{b9bb4db7-4330-4a17-8d82-0ffd6f8f91b5}</Project>
+      <Name>SmartBuilder.Utilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

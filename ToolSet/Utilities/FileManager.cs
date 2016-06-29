@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace SmartBuilder
+namespace SmartBuilder.ToolSet.Utilities
 {
     public static class FileManager
     {

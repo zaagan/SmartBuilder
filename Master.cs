@@ -7,7 +7,7 @@ namespace SmartBuilder
         public Master()
         {
             InitializeComponent();
-
+            Properties.Settings settings = SmartBuilder.Properties.Settings.Default;
         }
 
     }

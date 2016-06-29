@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using SmartBuilder.Properties;
 using System.IO;
 using System.ComponentModel;
+using SmartBuilder.ToolSet.Utilities;
+using SmartBuilder.Repository.MsSQL;
 
 namespace SmartBuilder.Controls
 {
@@ -421,7 +423,8 @@ namespace SmartBuilder.Controls
             Settings.Default.EnableRequired = chkEnableRequired.Checked;
 
             Settings.Default.Save();
-            lblOutputString.Text = TableInfoGenerator.LoadTableInfoPrimarySettings();
+            InfoClassGenerator infoClassGenerator = new InfoClassGenerator(SystemSettings.GetSystemSettings());
+            lblOutputString.Text = infoClassGenerator.LoadTableInfoPrimarySettings();
         }
 
         #endregion

@@ -1,105 +1,110 @@
-﻿using System.Text;
-using System.Data;
-using SmartBuilder.Properties;
+﻿using System.Data;
+using System.Text;
 
-namespace SmartBuilder
+namespace SmartBuilder.Repository.MsSQL
 {
-
-    public class TableInfoGenerator
+    public class InfoClassGenerator
     {
         private enum InfoParamTypes { Name, Order, Namespace };
-        public static string BuildInfoClassforGivenDataTable(DataTable dt, string ClassName, bool isNullableRequred, bool isSerializable)
+
+        SystemSettingsInfo settings = null;
+
+        public InfoClassGenerator(SystemSettingsInfo systemSettingsInfo)
+        { this.settings = systemSettingsInfo; }
+     
+
+        public string BuildInfoClassforGivenDataTable(DataTable dt, string ClassName, bool isNullableRequred, bool isSerializable)
         {
             StringBuilder strbText = new StringBuilder();
 
             if (isSerializable)
-            { strbText.Append(GetDataContractString(USUtil.T)); }
+            { strbText.Append(GetDataContractString(Helper.T)); }
 
-            strbText.Append(USUtil.T);
-            strbText.Append(USUtil.Public_Class_S);
+            strbText.Append(Helper.T);
+            strbText.Append(Helper.Public_Class_S);
             strbText.Append(ClassName);
-            strbText.Append(USUtil.R);
-            strbText.Append(USUtil.T_OpenBracket);
+            strbText.Append(Helper.R);
+            strbText.Append(Helper.T_OpenBracket);
 
             for (int i = 0; i < dt.Rows.Count; i++)
             {
                 int count = i;
                 count++;
                 string columnName = dt.Rows[i]["ColumnName"].ToString();
-                
-                strbText.Append(USUtil.R);
+
+                strbText.Append(Helper.R);
                 if (isSerializable)
                 {
-                    strbText.Append(GetRequiredString(USUtil.NTT).TrimEnd());
-                    strbText.Append(GetDisplayAttributeString(USUtil.NTT).TrimEnd());
-                    strbText.Append(GetDataMemberString(USUtil.NTT, columnName, count.ToString(), "#").TrimEnd());
+                    strbText.Append(GetRequiredString(Helper.NTT).TrimEnd());
+                    strbText.Append(GetDisplayAttributeString(Helper.NTT).TrimEnd());
+                    strbText.Append(GetDataMemberString(Helper.NTT, columnName, count.ToString(), "#").TrimEnd());
                 }
-                strbText.Append(USUtil.NTT+" public " + dt.Rows[i]["ColumnType"].ToString() + USUtil.S);
+                strbText.Append(Helper.NTT + " public " + dt.Rows[i]["ColumnType"].ToString() + Helper.S);
 
-                string nullable = USUtil.S;
+                string nullable = Helper.S;
                 if (isNullableRequred)
                 {
-                    nullable = dt.Rows[i]["NullableSign"].ToString() + USUtil.S;
+                    nullable = dt.Rows[i]["NullableSign"].ToString() + Helper.S;
                 }
                 strbText.Append(columnName + nullable + " { get; set; }");
             }
 
-            strbText.Append(USUtil.R);
-            strbText.Append(USUtil.T_CloseBracket);
+            strbText.Append(Helper.R);
+            strbText.Append(Helper.T_CloseBracket);
 
             return strbText.ToString();
         }
 
 
-        private static string GetDataContractString(string spacings)
+        private string GetDataContractString(string spacings)
         {
             string returnString = string.Empty;
-            if (Settings.Default.EnableDataContract)
+            if (settings.EnableDataContract)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append(spacings);
                 sb.Append("[DataContract");
-                sb.Append(OperatorComparator(Settings.Default.EnableDataContractName, Settings.Default.EnableDataContractNamespace, InfoParamTypes.Name.ToString(), InfoParamTypes.Namespace.ToString()));
+                sb.Append(OperatorComparator(settings.EnableDataContractName, settings.EnableDataContractNamespace, InfoParamTypes.Name.ToString(), InfoParamTypes.Namespace.ToString()));
                 sb.Append("]\n");
                 returnString = sb.ToString();
             }
             return returnString;
         }
 
-        private static string GetDataMemberString(string spacings, params string[] itemCode)
+        private string GetDataMemberString(string spacings, params string[] itemCode)
         {
             string returnString = string.Empty;
-            if (Settings.Default.EnableDataMember)
+            if (settings.EnableDataMember)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append(spacings);
                 sb.Append("[DataMember");
-                sb.Append(OperatorComparator(Settings.Default.EnableDataMemberName, Settings.Default.EnableDataMemberOrder, InfoParamTypes.Name.ToString(), InfoParamTypes.Order.ToString(), itemCode));
+                sb.Append(OperatorComparator(settings.EnableDataMemberName, settings.EnableDataMemberOrder, InfoParamTypes.Name.ToString(), InfoParamTypes.Order.ToString(), itemCode));
                 sb.Append("]\n");
                 returnString = sb.ToString();
             }
             return returnString;
         }
 
-        private static string GetDisplayAttributeString(string spacings)
+        private string GetDisplayAttributeString(string spacings)
         {
             string returnString = string.Empty;
-            if (Settings.Default.EnableDisplayAttributes)
+            if (settings.EnableDisplayAttributes)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append(spacings);
                 sb.Append("[DisplayAttribute");
-                sb.Append(OperatorComparator(Settings.Default.EnableDisplayAttributeName, Settings.Default.EnableDisplayAttributeOrder, InfoParamTypes.Name.ToString(), InfoParamTypes.Order.ToString()));
+                sb.Append(OperatorComparator(settings.EnableDisplayAttributeName, settings.EnableDisplayAttributeOrder, InfoParamTypes.Name.ToString(), InfoParamTypes.Order.ToString()));
                 sb.Append("]\n");
                 returnString = sb.ToString();
             }
             return returnString;
         }
 
-        private static string GetRequiredString(string spacings)
+        private  string GetRequiredString(string spacings)
         {
             string returnString = string.Empty;
-            if (Settings.Default.EnableRequired)
+            if (settings.EnableRequired)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append(spacings);
@@ -109,16 +114,16 @@ namespace SmartBuilder
             return returnString;
         }
 
-        public static string LoadTableInfoPrimarySettings(string ClassName = "YourClassName")
+        public string LoadTableInfoPrimarySettings(string ClassName = "YourClassName")
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(GetDataContractString(string.Empty));
-            sb.Append(USUtil.Public_Class_S);
+            sb.Append(Helper.Public_Class_S);
             sb.Append(ClassName);
             sb.Append("\n{\n");
-            sb.Append(GetDisplayAttributeString(USUtil.T));
-            sb.Append(GetDataMemberString(USUtil.T));
-            sb.Append(GetRequiredString(USUtil.T));
+            sb.Append(GetDisplayAttributeString(Helper.T));
+            sb.Append(GetDataMemberString(Helper.T));
+            sb.Append(GetRequiredString(Helper.T));
             sb.Append("\tpublic string YourInfo { get; set; }\n");
             sb.Append("}");
             return sb.ToString();
@@ -161,7 +166,7 @@ namespace SmartBuilder
                         }
 
                     default:
-                             {
+                        {
                             sb.Append("=\"");
                             sb.Append(param2);
                             sb.Append("\")"); ;
@@ -210,5 +215,4 @@ namespace SmartBuilder
             return returnString;
         }
     }
-
 }

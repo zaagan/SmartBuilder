@@ -30,7 +30,7 @@ namespace SmartBuilder.Controls
             txtTableName.AutoCompleteSource = AutoCompleteSource.CustomSource;
             AutoCompleteStringCollection namesCollection = new AutoCompleteStringCollection();
 
-            namesCollection = USUtil.GetTableList(databaseName, ConnectionString);
+            namesCollection = USUtil.GetTablesFromDatabase(databaseName, ConnectionString);
             txtTableName.AutoCompleteCustomSource = namesCollection;
         }
 

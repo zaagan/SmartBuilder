@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using System.Collections;
 using System.Collections.Generic;
+using SmartBuilder.ToolSet.Utilities;
 
 namespace SmartBuilder.Controls
 {
@@ -9,6 +10,8 @@ namespace SmartBuilder.Controls
     {
         Action<string> AddToFastNote;
         string ConnectionString = string.Empty, databaseName = string.Empty;
+
+
         public ctrlTableInfo(string connectionString, string databaseName, Action<string> addToFastNote)
         {
             InitializeComponent();
@@ -21,7 +24,7 @@ namespace SmartBuilder.Controls
             txtTableName.AutoCompleteMode = AutoCompleteMode.Suggest;
             txtTableName.AutoCompleteSource = AutoCompleteSource.CustomSource;
             AutoCompleteStringCollection namesCollection = new AutoCompleteStringCollection();
-            namesCollection = USUtil.GetTableList(databaseName, connectionString);
+            namesCollection = USUtil.GetTablesFromDatabase(databaseName, connectionString);
             txtTableName.AutoCompleteCustomSource = namesCollection;
         }
 
@@ -33,7 +36,7 @@ namespace SmartBuilder.Controls
 
             if (ddlType.SelectedValue.ToString() == USUtil.Tbl || ddlType.SelectedValue.ToString() == "")
             {
-                namesCollection = USUtil.GetTableList(databaseName, ConnectionString);
+                namesCollection = USUtil.GetTablesFromDatabase(databaseName, ConnectionString);
                 txtTableName.AutoCompleteCustomSource = namesCollection;
             }
             else
@@ -93,7 +96,7 @@ namespace SmartBuilder.Controls
 
                 if (ddlType.SelectedValue.ToString().Trim() == USUtil.Tbl || ddlType.SelectedValue.ToString().Trim() == string.Empty)
                 {
-                    AdonaiBuildStrucutreInfo buildInfo = new AdonaiBuildStrucutreInfo();
+                    AdonaiBuildStructureInfo buildInfo = new AdonaiBuildStructureInfo();
                     buildInfo.TableName = txtTableName.Text.Trim();
                     buildInfo.InfoClassName = txtClassName.Text.Trim();
                     buildInfo.ConnectionString = ConnectionString;
