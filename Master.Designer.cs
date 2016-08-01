@@ -31,8 +31,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Master));
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.adonaiFastNote1 = new SmartBuilder.Controls.AdonaiFastNote();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.tileController1 = new SmartBuilder.Controls.TileController();
+            this.adonaiFastNote1 = new SmartBuilder.Controls.AdonaiFastNote();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -59,6 +60,30 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "Builder";
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Location = new System.Drawing.Point(13, 9);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(43, 35);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 3;
+            this.pictureBox1.TabStop = false;
+            // 
+            // tileController1
+            // 
+            this.tileController1.ActiveColor = System.Drawing.Color.CornflowerBlue;
+            this.tileController1.AdonaiHiddenTitle = "Second";
+            this.tileController1.AdonaiShownTitle = "First";
+            this.tileController1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.tileController1.IconType = FontAwesomeIcons.IconType.Joomla;
+            this.tileController1.InactiveColor = System.Drawing.Color.DimGray;
+            this.tileController1.Location = new System.Drawing.Point(221, 15);
+            this.tileController1.MinimumSize = new System.Drawing.Size(155, 28);
+            this.tileController1.Name = "tileController1";
+            this.tileController1.Size = new System.Drawing.Size(155, 28);
+            this.tileController1.TabIndex = 4;
+            // 
             // adonaiFastNote1
             // 
             this.adonaiFastNote1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -77,22 +102,13 @@
             this.adonaiFastNote1.TabIndex = 0;
             this.adonaiFastNote1.UserName = "";
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(13, 9);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(43, 35);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 3;
-            this.pictureBox1.TabStop = false;
-            // 
             // Master
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(382, 568);
+            this.Controls.Add(this.tileController1);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -114,6 +130,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private Controls.TileController tileController1;
     }
 }
 
