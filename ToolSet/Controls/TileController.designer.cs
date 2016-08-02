@@ -46,7 +46,7 @@
             this.btnTransit.Size = new System.Drawing.Size(38, 28);
             this.btnTransit.TabIndex = 0;
             this.btnTransit.TabStop = false;
-            this.btnTransit.ToolTipText = null;
+            this.btnTransit.ToolTipText = "Exchange Stage";
             this.btnTransit.Click += new System.EventHandler(this.btnTransit_Click);
             // 
             // titleControl1
@@ -55,6 +55,7 @@
             this.titleControl1.AdonaiShownTitle = "First";
             this.titleControl1.AutoSize = true;
             this.titleControl1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.titleControl1.Font = new System.Drawing.Font("Segoe UI Symbol", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.titleControl1.Location = new System.Drawing.Point(0, 0);
             this.titleControl1.MinimumSize = new System.Drawing.Size(117, 28);
             this.titleControl1.Name = "titleControl1";
@@ -67,6 +68,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.titleControl1);
             this.Controls.Add(this.btnTransit);
+            this.Font = new System.Drawing.Font("Segoe UI Semilight", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.MinimumSize = new System.Drawing.Size(155, 28);
             this.Name = "TileController";
             this.Size = new System.Drawing.Size(155, 28);

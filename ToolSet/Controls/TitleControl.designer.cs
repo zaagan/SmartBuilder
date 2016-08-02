@@ -61,10 +61,10 @@ namespace SmartBuilder.Controls
             // 
             this.lblHidden.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lblHidden.AutoSize = true;
-            this.lblHidden.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblHidden.Location = new System.Drawing.Point(49, 3);
+            this.lblHidden.Font = new System.Drawing.Font("Segoe UI Semilight", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblHidden.Location = new System.Drawing.Point(54, 3);
             this.lblHidden.Name = "lblHidden";
-            this.lblHidden.Size = new System.Drawing.Size(65, 21);
+            this.lblHidden.Size = new System.Drawing.Size(60, 21);
             this.lblHidden.TabIndex = 287;
             this.lblHidden.Text = "Second";
             // 
@@ -91,10 +91,10 @@ namespace SmartBuilder.Controls
             // 
             this.lblShown.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.lblShown.AutoSize = true;
-            this.lblShown.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblShown.Location = new System.Drawing.Point(73, 3);
+            this.lblShown.Font = new System.Drawing.Font("Segoe UI Semilight", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblShown.Location = new System.Drawing.Point(75, 3);
             this.lblShown.Name = "lblShown";
-            this.lblShown.Size = new System.Drawing.Size(41, 21);
+            this.lblShown.Size = new System.Drawing.Size(39, 21);
             this.lblShown.TabIndex = 286;
             this.lblShown.Text = "First";
             // 
@@ -106,9 +106,10 @@ namespace SmartBuilder.Controls
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.Controls.Add(this.pnlHidden);
             this.Controls.Add(this.pnlShown);
+            this.Font = new System.Drawing.Font("Segoe UI Semilight", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.MinimumSize = new System.Drawing.Size(117, 28);
             this.Name = "TitleControl";
-            this.Size = new System.Drawing.Size(318, 150);
+            this.Size = new System.Drawing.Size(117, 28);
             this.pnlHidden.ResumeLayout(false);
             this.pnlHidden.PerformLayout();
             this.pnlShown.ResumeLayout(false);

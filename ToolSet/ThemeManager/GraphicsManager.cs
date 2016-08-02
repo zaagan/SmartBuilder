@@ -10,7 +10,7 @@ namespace SmartBuilder
         {
             System.Drawing.Graphics graphicsObj;
             graphicsObj = frm.CreateGraphics();
-            Pen myPen = new Pen(System.Drawing.Color.LightGray, thickness);
+            Pen myPen = new Pen(color, thickness);
             graphicsObj.DrawLine(myPen, x, y, x1, y1);
         }
 

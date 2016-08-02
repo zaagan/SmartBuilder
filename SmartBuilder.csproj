@@ -92,6 +92,12 @@
     <Compile Include="Enums\LanguageType.cs" />
     <Compile Include="Enums\SourceType.cs" />
     <Compile Include="RepositoryFactory.cs" />
+    <Compile Include="ToolSet\Controls\AdonaiDynamiteButton.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ToolSet\Controls\AdonaiDynamiteButton.designer.cs">
+      <DependentUpon>AdonaiDynamiteButton.cs</DependentUpon>
+    </Compile>
     <Compile Include="ToolSet\Controls\AdonaiFastNote.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -104,25 +110,29 @@
     <Compile Include="ToolSet\Controls\AdonaiLabel.designer.cs">
       <DependentUpon>AdonaiLabel.cs</DependentUpon>
     </Compile>
+    <Compile Include="ToolSet\Controls\AdonaiPanel.cs" />
     <Compile Include="ToolSet\Controls\AdonaiTabControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ToolSet\Controls\ctrlMultiTableSelector.cs">
+    <Compile Include="ToolSet\Controls\AdonaiTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ToolSet\Controls\SQLBuilder\ctrlMultiTableSelector.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ToolSet\Controls\ctrlMultiTableSelector.Designer.cs">
+    <Compile Include="ToolSet\Controls\SQLBuilder\ctrlMultiTableSelector.Designer.cs">
       <DependentUpon>ctrlMultiTableSelector.cs</DependentUpon>
     </Compile>
-    <Compile Include="ToolSet\Controls\ctrlSpDefinitions.cs">
+    <Compile Include="ToolSet\Controls\SQLBuilder\ctrlSpDefinitions.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ToolSet\Controls\ctrlSpDefinitions.Designer.cs">
+    <Compile Include="ToolSet\Controls\SQLBuilder\ctrlSpDefinitions.Designer.cs">
       <DependentUpon>ctrlSpDefinitions.cs</DependentUpon>
     </Compile>
-    <Compile Include="ToolSet\Controls\ctrlTableInfo.cs">
+    <Compile Include="ToolSet\Controls\SQLBuilder\ctrlTableInfo.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ToolSet\Controls\ctrlTableInfo.Designer.cs">
+    <Compile Include="ToolSet\Controls\SQLBuilder\ctrlTableInfo.Designer.cs">
       <DependentUpon>ctrlTableInfo.cs</DependentUpon>
     </Compile>
     <Compile Include="ToolSet\Controls\TileController.cs">
@@ -136,6 +146,18 @@
     </Compile>
     <Compile Include="ToolSet\Controls\TitleControl.designer.cs">
       <DependentUpon>TitleControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ToolSet\Controls\Utilities\SQLFormatter.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ToolSet\Controls\Utilities\SQLFormatter.Designer.cs">
+      <DependentUpon>SQLFormatter.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ToolSet\Controls\Utilities\UtilityContainer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ToolSet\Controls\Utilities\UtilityContainer.Designer.cs">
+      <DependentUpon>UtilityContainer.cs</DependentUpon>
     </Compile>
     <Compile Include="ToolSet\Dumpyard\Dump.cs">
       <SubType>UserControl</SubType>
@@ -163,21 +185,25 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ToolSet\Utilities\MenuItems.cs" />
     <Compile Include="ToolSet\Utilities\SystemSettings.cs" />
     <Compile Include="ToolSet\Utilities\TransitionManager.cs" />
+    <EmbeddedResource Include="ToolSet\Controls\AdonaiDynamiteButton.resx">
+      <DependentUpon>AdonaiDynamiteButton.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ToolSet\Controls\AdonaiFastNote.resx">
       <DependentUpon>AdonaiFastNote.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ToolSet\Controls\AdonaiTabControl.resx">
       <DependentUpon>AdonaiTabControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ToolSet\Controls\ctrlMultiTableSelector.resx">
+    <EmbeddedResource Include="ToolSet\Controls\SQLBuilder\ctrlMultiTableSelector.resx">
       <DependentUpon>ctrlMultiTableSelector.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ToolSet\Controls\ctrlSpDefinitions.resx">
+    <EmbeddedResource Include="ToolSet\Controls\SQLBuilder\ctrlSpDefinitions.resx">
       <DependentUpon>ctrlSpDefinitions.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ToolSet\Controls\ctrlTableInfo.resx">
+    <EmbeddedResource Include="ToolSet\Controls\SQLBuilder\ctrlTableInfo.resx">
       <DependentUpon>ctrlTableInfo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ToolSet\Controls\TileController.resx">
@@ -185,6 +211,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ToolSet\Controls\TitleControl.resx">
       <DependentUpon>TitleControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ToolSet\Controls\Utilities\SQLFormatter.resx">
+      <DependentUpon>SQLFormatter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ToolSet\Controls\Utilities\UtilityContainer.resx">
+      <DependentUpon>UtilityContainer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ToolSet\Dumpyard\Dump.resx">
       <DependentUpon>Dump.cs</DependentUpon>

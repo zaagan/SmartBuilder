@@ -32,8 +32,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.tileController1 = new SmartBuilder.Controls.TileController();
-            this.adonaiFastNote1 = new SmartBuilder.Controls.AdonaiFastNote();
+            this.pnlLeftContainer = new System.Windows.Forms.Panel();
+            this.contentSwiper = new SmartBuilder.Controls.TileController();
+            this.ctrlFastNote = new SmartBuilder.Controls.AdonaiFastNote();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -70,49 +71,58 @@
             this.pictureBox1.TabIndex = 3;
             this.pictureBox1.TabStop = false;
             // 
-            // tileController1
+            // pnlLeftContainer
             // 
-            this.tileController1.ActiveColor = System.Drawing.Color.CornflowerBlue;
-            this.tileController1.AdonaiHiddenTitle = "Second";
-            this.tileController1.AdonaiShownTitle = "First";
-            this.tileController1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.tileController1.IconType = FontAwesomeIcons.IconType.Joomla;
-            this.tileController1.InactiveColor = System.Drawing.Color.DimGray;
-            this.tileController1.Location = new System.Drawing.Point(221, 15);
-            this.tileController1.MinimumSize = new System.Drawing.Size(155, 28);
-            this.tileController1.Name = "tileController1";
-            this.tileController1.Size = new System.Drawing.Size(155, 28);
-            this.tileController1.TabIndex = 4;
+            this.pnlLeftContainer.Location = new System.Drawing.Point(-383, 52);
+            this.pnlLeftContainer.Name = "pnlLeftContainer";
+            this.pnlLeftContainer.Size = new System.Drawing.Size(382, 516);
+            this.pnlLeftContainer.TabIndex = 5;
             // 
-            // adonaiFastNote1
+            // contentSwiper
             // 
-            this.adonaiFastNote1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.contentSwiper.ActiveColor = System.Drawing.Color.CornflowerBlue;
+            this.contentSwiper.AdonaiHiddenTitle = "Builder";
+            this.contentSwiper.AdonaiShownTitle = "Utilities";
+            this.contentSwiper.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.contentSwiper.Font = new System.Drawing.Font("Segoe UI Semilight", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.contentSwiper.IconType = FontAwesomeIcons.IconType.Exchange;
+            this.contentSwiper.InactiveColor = System.Drawing.Color.DimGray;
+            this.contentSwiper.Location = new System.Drawing.Point(248, 15);
+            this.contentSwiper.MinimumSize = new System.Drawing.Size(155, 28);
+            this.contentSwiper.Name = "contentSwiper";
+            this.contentSwiper.Size = new System.Drawing.Size(155, 28);
+            this.contentSwiper.TabIndex = 4;
+            // 
+            // ctrlFastNote
+            // 
+            this.ctrlFastNote.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.adonaiFastNote1.ConnectionString = "Data Source=;Initial Catalog=;User Id=;Password=;";
-            this.adonaiFastNote1.DatabaseIndex = -1;
-            this.adonaiFastNote1.DatabaseName = "";
-            this.adonaiFastNote1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.adonaiFastNote1.Location = new System.Drawing.Point(0, 52);
-            this.adonaiFastNote1.MinimumSize = new System.Drawing.Size(380, 516);
-            this.adonaiFastNote1.Name = "adonaiFastNote1";
-            this.adonaiFastNote1.Password = "";
-            this.adonaiFastNote1.ServerName = "";
-            this.adonaiFastNote1.Size = new System.Drawing.Size(382, 516);
-            this.adonaiFastNote1.TabIndex = 0;
-            this.adonaiFastNote1.UserName = "";
+            this.ctrlFastNote.ConnectionString = "Data Source=;Initial Catalog=;User Id=;Password=;";
+            this.ctrlFastNote.DatabaseIndex = -1;
+            this.ctrlFastNote.DatabaseName = "";
+            this.ctrlFastNote.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ctrlFastNote.Location = new System.Drawing.Point(0, 52);
+            this.ctrlFastNote.MinimumSize = new System.Drawing.Size(380, 516);
+            this.ctrlFastNote.Name = "ctrlFastNote";
+            this.ctrlFastNote.Password = "";
+            this.ctrlFastNote.ServerName = "";
+            this.ctrlFastNote.Size = new System.Drawing.Size(409, 516);
+            this.ctrlFastNote.TabIndex = 0;
+            this.ctrlFastNote.UserName = "";
             // 
             // Master
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(382, 568);
-            this.Controls.Add(this.tileController1);
+            this.ClientSize = new System.Drawing.Size(409, 568);
+            this.Controls.Add(this.pnlLeftContainer);
+            this.Controls.Add(this.contentSwiper);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.adonaiFastNote1);
+            this.Controls.Add(this.ctrlFastNote);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(398, 607);
             this.Name = "Master";
@@ -126,11 +136,12 @@
 
         #endregion
 
-        private SmartBuilder.Controls.AdonaiFastNote adonaiFastNote1;
+        private SmartBuilder.Controls.AdonaiFastNote ctrlFastNote;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private Controls.TileController tileController1;
+        private Controls.TileController contentSwiper;
+        private System.Windows.Forms.Panel pnlLeftContainer;
     }
 }
 

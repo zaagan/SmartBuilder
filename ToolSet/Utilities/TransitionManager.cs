@@ -86,8 +86,7 @@ namespace SmartBuilder.ToolSet.Utilities
             int location = firstLocation;
             //backControl.Width;
             Control ctrlOnScreen, ctrlOffScreen;
-            if (mainScreenControl.Left
- == location)
+            if (mainScreenControl.Left == location)
             {
                 ctrlOnScreen = mainScreenControl;
                 ctrlOffScreen = backControl;
@@ -100,10 +99,11 @@ namespace SmartBuilder.ToolSet.Utilities
             ctrlOnScreen.SendToBack();
             ctrlOffScreen.BringToFront();
 
-            ctrlOnScreen.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
+            AnchorStyles anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
+            ctrlOnScreen.Anchor = anchor;
             ctrlOnScreen.Size = mainScreenControl.Size;
             ctrlOffScreen.Size = mainScreenControl.Size;
-            ctrlOffScreen.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
+            ctrlOffScreen.Anchor = anchor;
             Transition t = new Transition(new TransitionType_EaseInEaseOut(500));
 
             t.add(ctrlOnScreen, "Left", 0);
@@ -214,8 +214,7 @@ namespace SmartBuilder.ToolSet.Utilities
         { Transition.run(containedControl, "Top", 12, new TransitionType_ThrowAndCatch(1500)); }
 
 
-        //  private const string STRING_SHORT = "Hello, World!";
-        //    private const string STRING_LONG = "A longer piece of text.";
+       
         public static void TextTransition(string oldText, string longText, Control lblTextContainer, Control lblSecondaryTextContainer)
         {
             string strText1, strText2;
@@ -244,7 +243,29 @@ namespace SmartBuilder.ToolSet.Utilities
             t.run();
         }
 
+        public static void TextTransition_StaticColor(string oldText, string longText, Control lblTextContainer, Control lblSecondaryTextContainer)
+        {
+            string strText1, strText2;
+            //Color color1, color2;
+            if (lblTextContainer.Text == oldText)
+            {
+                strText1 = longText;
+                strText2 = oldText;
+            }
+            else
+            {
+                strText1 = oldText;
+                strText2 = longText;
+            }
 
+            // We create a transition to animate all four properties at the same time...
+            Transition t = new Transition(new TransitionType_Linear(300));
+            t.add(lblTextContainer, "Text", strText1);
+            //t.add(lblTextContainer, "ForeColor", color1);
+            t.add(lblSecondaryTextContainer, "Text", strText2);
+            //t.add(lblSecondaryTextContainer, "ForeColor", color2);
+            t.run();
+        }
 
 
         public static void PictureTransition(Control parentControl, Control m_ActivePicture, Control m_InactivePicture)

@@ -16,18 +16,7 @@ namespace SmartBuilder.Controls
 {
     public partial class AdonaiFastNote : UserControl
     {
-        /// <summary>
-        /// Remove Application Flickering
-        /// </summary>
-        protected override CreateParams CreateParams
-        {
-            get
-            {
-                CreateParams cp = base.CreateParams;
-                cp.ExStyle |= 0x02000000;
-                return cp;
-            }
-        }
+      
         public AdonaiFastNote()
         {
             InitializeComponent();
@@ -432,13 +421,13 @@ namespace SmartBuilder.Controls
 
         #region Painting the UI
         private void gradientPanel1_Paint(object sender, PaintEventArgs e)
-        { GraphicsManager.DrawLineInFooter(gradientPanel1, Color.Black, 3); }
+        { GraphicsManager.DrawLineInFooter(gradientPanel1, Color.LightGray, 3); }
         private void spcDashboard_Panel1_Paint(object sender, PaintEventArgs e)
-        { GraphicsManager.DrawLineInFooter(spcDashboard.Panel1, Color.Black, 3); }
+        { GraphicsManager.DrawLineInFooter(spcDashboard.Panel1, Color.LightGray, 3); }
         private void pnlTypeSelector_Paint(object sender, PaintEventArgs e)
         {
-            GraphicsManager.DrawLineInHeader(pnlTypeSelector, Color.DimGray, 5);
-            GraphicsManager.DrawLineInFooter(pnlTypeSelector, Color.Black, 3);
+            GraphicsManager.DrawLineInHeader(pnlTypeSelector, Color.LightGray, 5);
+            GraphicsManager.DrawLineInFooter(pnlTypeSelector, Color.LightGray, 3);
         }
 
         #endregion
