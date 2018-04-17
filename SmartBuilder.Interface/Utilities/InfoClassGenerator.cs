@@ -39,14 +39,16 @@ namespace SmartBuilder.Repository.MsSQL
                     strbText.Append(GetDisplayAttributeString(Helper.NTT).TrimEnd());
                     strbText.Append(GetDataMemberString(Helper.NTT, columnName, count.ToString(), "#").TrimEnd());
                 }
-                strbText.Append(Helper.NTT + " public " + dt.Rows[i]["ColumnType"].ToString() + Helper.S);
 
                 string nullable = Helper.S;
                 if (isNullableRequred)
                 {
                     nullable = dt.Rows[i]["NullableSign"].ToString() + Helper.S;
                 }
-                strbText.Append(columnName + nullable + " { get; set; }");
+
+                strbText.Append(Helper.NTT + " public " + dt.Rows[i]["ColumnType"].ToString() + nullable);
+
+                strbText.Append(columnName + " { get; set; }");
             }
 
             strbText.Append(Helper.R);
